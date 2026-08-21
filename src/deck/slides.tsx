@@ -48,13 +48,27 @@ function Donut() {
   const emea = 0.035;
   return (
     <svg viewBox="0 0 240 240" className="h-full w-full">
-      {/* Same stroke-dasharray/dashoffset sweep technique as Rest of Company
-          below, sized to EMEA's own sliver, starting at the same moment (no
-          idle wait) but stretched out longer so it's still visibly sweeping
-          after Rest of Company has settled. Eased with a gentle, even
-          in-out curve (rather than Rest of Company's front-loaded one) so
-          this tiny sliver reads as a slow, steady creep instead of a quick
-          snap followed by an imperceptible crawl. */}
+      {/* Rest of Company sweeps in only its own 96.5% arc — its path is
+          rotated to start just past the EMEA sliver's slot, so the sliver's
+          empty space at 12 o'clock is reserved for the whole sweep. The
+          EMEA sliver draws into that reserved gap as a second step; its
+          delay is tuned to when the front-loaded purple sweep LOOKS done
+          (its last stretch is an imperceptible crawl), not its nominal
+          end time, so the hand-off reads as immediate. The two arcs cover
+          disjoint parts of the ring, so the slight overlap in time can
+          never make them collide. */}
+      <circle
+        cx="120"
+        cy="120"
+        r="90"
+        fill="none"
+        stroke="var(--brand)"
+        strokeWidth="34"
+        strokeDasharray={`${c * (1 - emea)} ${c}`}
+        strokeDashoffset={active ? 0 : c * (1 - emea)}
+        transform={`rotate(${-90 + 360 * emea} 120 120)`}
+        style={{ transition: "stroke-dashoffset 1.4s cubic-bezier(0.22,0.61,0.24,1) 0.25s" }}
+      />
       <circle
         cx="120"
         cy="120"
@@ -65,19 +79,7 @@ function Donut() {
         strokeDasharray={`${c} ${c}`}
         strokeDashoffset={active ? c * (1 - emea) : c}
         transform="rotate(-90 120 120)"
-        style={{ transition: "stroke-dashoffset 2.4s cubic-bezier(0.45,0,0.2,1) 0.25s" }}
-      />
-      <circle
-        cx="120"
-        cy="120"
-        r="90"
-        fill="none"
-        stroke="var(--brand)"
-        strokeWidth="34"
-        strokeDasharray={`${c * (1 - emea)} ${c}`}
-        strokeDashoffset={active ? -c * emea : c}
-        transform="rotate(-90 120 120)"
-        style={{ transition: "stroke-dashoffset 1.4s cubic-bezier(0.22,0.61,0.24,1) 0.25s" }}
+        style={{ transition: "stroke-dashoffset 0.7s cubic-bezier(0.45,0,0.2,1) 1.3s" }}
       />
       <text
         x="120"
@@ -120,7 +122,7 @@ export function SlideRecommend(p: P) {
                 text: (
                   <>
                     Under current structure, financial break-even achievable by 2032 with GTx (not
-                    probability adjusted) or 2034 (ARIKAYCE &amp; BRINSUPRI only) –{" "}
+                    probability adjusted) or 2034 (AERIVAX &amp; ZEVRINA only) –{" "}
                     <em>does not account for MFN impact on US &amp; Japan</em>
                   </>
                 ),
@@ -327,13 +329,13 @@ export function SlideLean(p: P) {
               className="mt-[1.2vh]"
               items={[
                 "Ongoing global Tech Ops and Clin Ops/Trials support",
-                "Targeted promotion of Arikayce and Brinsupri in select markets",
+                "Targeted promotion of Aerivax and Zevrina in select markets",
               ]}
             />
           </div>
           <div>
             <R d={5}>
-              <h3 className="deck-body font-bold text-brand">Preliminary Assessment led by Neil…</h3>
+              <h3 className="deck-body font-bold text-brand">Preliminary Assessment led by EMEA leadership…</h3>
             </R>
             <Bullets
               start={6}
@@ -342,7 +344,7 @@ export function SlideLean(p: P) {
                 "EMEA organisation reduced by around 70 FTEs",
                 "Total OPEX halved",
                 "4 year EBITDA improved >$180M",
-                "Arikayce revenues assumed to decrease ~ $12 MM over 4 years (assumes no Brinsupri reimbursement)",
+                "Aerivax revenues assumed to decrease ~ $12 MM over 4 years (assumes no Zevrina reimbursement)",
                 "Restructuring costs estimated at ~$5 – 10 MM1",
               ]}
             />
@@ -560,7 +562,7 @@ export function SlideBreakeven2034(p: P) {
     <Slide
       id="break-even-2034"
       tone="light"
-      title="ARIKAYCE & BRINSUPRI only cumulative break-even in 2034"
+      title="AERIVAX & ZEVRINA only cumulative break-even in 2034"
       footnote="G&A costs have not been allocated to the individual countries; All other infrastructure costs are included"
       {...p}
     >
@@ -612,7 +614,7 @@ export function SlidePricing(p: P) {
     <Slide
       id="pricing"
       tone="dark"
-      title="BRINSUPRI avg net price estimated <$10K, declining to ~$8K"
+      title="ZEVRINA avg net price estimated <$10K, declining to ~$8K"
       footnote="1. Prices represent direct pricing. (team is proposing import model initially)"
       {...p}
     >
@@ -867,7 +869,7 @@ export const SLIDES = [
   { id: "supporting-documents", label: "Supporting documents", C: SlideChapter },
   { id: "break-even-2032", label: "Break-even 2032", C: SlideBreakeven2032 },
   { id: "break-even-2034", label: "Break-even 2034", C: SlideBreakeven2034 },
-  { id: "pricing", label: "BRINSUPRI price", C: SlidePricing },
+  { id: "pricing", label: "ZEVRINA price", C: SlidePricing },
   { id: "cumulative-pl", label: "Cumulative P&L", C: SlideCumulativePL },
   { id: "ftes", label: "FTEs breakdown", C: SlideFtes },
 ];
