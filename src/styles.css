@@ -6,8 +6,12 @@
 
 /*
  * Averon EMEA Strategy Review — design system.
- * Colours, typography and rhythm are taken from the source deck theme
- * (Georgia headlines, Arial body, Averon purple #440099 palette).
+ * Typography and rhythm are taken from the source deck theme
+ * (Georgia headlines, Arial body). The colour system follows the reference
+ * deck: deep violet brand, sky-blue highlight, lavender tints and
+ * full-bleed violet→sky gradient surfaces for dark slides. "magenta" is the
+ * name of the secondary accent slot — it now resolves to the legible violet
+ * highlight, "magenta-bright" to the sky highlight.
  */
 
 @theme inline {
@@ -54,6 +58,7 @@
   --color-rule: var(--rule);
   --color-panel: var(--panel);
   --color-paper: var(--paper);
+  --color-on-dark: var(--on-dark); /* text/lines on surface-dark slides */
 
   --font-display: Georgia, "Times New Roman", serif;
   --font-sans: Arial, Helvetica, sans-serif;
@@ -62,22 +67,39 @@
 :root {
   --radius: 0.25rem;
 
-  --brand: oklch(0.336 0.208 300.2); /* #440099 */
-  --brand-deep: oklch(0.252 0.171 300.5); /* #2E0068 */
-  --brand-mid: oklch(0.404 0.166 301.4); /* #5E3191 */
-  --brand-soft: oklch(0.784 0.093 305); /* light violet panel */
-  --magenta: oklch(0.487 0.203 328.6); /* #93328E */
-  --magenta-bright: oklch(0.572 0.264 328); /* #CB00A1 */
-  --sky: oklch(0.585 0.147 240.5); /* #0085CA */
-  --sky-light: oklch(0.745 0.111 234.4); /* #61B5E5 */
-  --ocean: oklch(0.427 0.192 264.6); /* #0047BB */
-  --teal: oklch(0.669 0.113 200.2); /* #00B0B9 */
-  --leaf: oklch(0.735 0.171 138.5); /* #6CC249 */
-  --ink: oklch(0.19 0 0); /* #1F1F1F */
-  --ink-soft: oklch(0.55 0 0); /* #7F7F7F */
-  --rule: oklch(0.885 0.004 300);
-  --panel: oklch(0.968 0.003 300); /* #F0F0F0-ish */
+  /* ---- Reference palette: deep violet · sky blue · lavender ---- */
+  --brand: oklch(0.36 0.19 285); /* deep violet */
+  --brand-deep: oklch(0.23 0.13 285);
+  --brand-mid: oklch(0.48 0.23 286);
+  --brand-soft: oklch(0.91 0.045 280); /* pale lavender */
+  --highlight: oklch(0.73 0.14 250); /* sky blue */
+  --highlight-strong: oklch(0.48 0.2 283); /* legible violet accent */
+  --magenta: var(--highlight-strong); /* secondary accent slot (text, markers, boxes) */
+  --magenta-bright: var(--highlight);
+  --sky: oklch(0.73 0.14 250);
+  --sky-light: oklch(0.88 0.055 255);
+  --ocean: oklch(0.48 0.2 260);
+  --teal: oklch(0.66 0.15 278);
+  --leaf: oklch(0.78 0.11 293);
+  --ink: oklch(0.23 0.045 283);
+  --ink-soft: oklch(0.46 0.04 278);
+  --rule: oklch(0.85 0.035 277);
+  --panel: oklch(0.96 0.018 278);
   --paper: oklch(1 0 0);
+
+  /* Dark-surface gradients (sky → violet → deep violet) */
+  --deck-dark-gradient: linear-gradient(125deg, var(--sky) 0%, var(--teal) 30%, var(--brand-mid) 58%, var(--brand-deep) 100%);
+  --deck-band-gradient: linear-gradient(125deg, var(--sky) 0%, var(--teal) 24%, var(--brand) 52%, var(--brand-deep) 78%, var(--brand-mid) 100%);
+  --deck-readable-gradient: linear-gradient(color-mix(in oklab, var(--brand-deep) 58%, transparent), color-mix(in oklab, var(--brand-deep) 58%, transparent)), var(--deck-dark-gradient);
+
+  /* Text / lines on surface-dark slides, and the white logo & tagline art */
+  --on-dark: oklch(1 0 0);
+  --on-dark-img: brightness(0) invert(1);
+
+  /* Brand artwork (cover / chapter backgrounds): rendered as a luminosity
+     pattern over the gradient so the gradient supplies the colour. */
+  --img-filter: grayscale(1) contrast(1.15) brightness(1.3);
+  --img-opacity: 0.55;
 
   --background: var(--paper);
   --foreground: var(--ink);
@@ -301,19 +323,33 @@
 /* ---------- Deck surfaces ---------- */
 
 @utility surface-dark {
-  background:
-    radial-gradient(
-      120% 100% at 88% 18%,
-      color-mix(in oklab, var(--magenta) 55%, transparent) 0%,
-      transparent 58%
-    ),
-    radial-gradient(
-      90% 80% at 72% 62%,
-      color-mix(in oklab, var(--sky) 42%, transparent) 0%,
-      transparent 62%
-    ),
-    var(--brand-deep);
-  color: #fff;
+  background: var(--deck-dark-gradient);
+  color: var(--on-dark);
+}
+
+@utility surface-band {
+  background: var(--deck-band-gradient);
+  color: var(--on-dark);
+}
+
+@utility surface-readable {
+  background: var(--deck-readable-gradient);
+  color: var(--on-dark);
+}
+
+@utility logo-mark {
+  display: inline-block;
+  aspect-ratio: 112 / 44; /* averon-logo.svg viewBox */
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: left center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: left center;
+}
+
+@utility on-dark-img {
+  filter: var(--on-dark-img);
 }
 
 @utility rule-thin {

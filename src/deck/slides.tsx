@@ -23,17 +23,17 @@ const FOOT = "All figures reflect preliminary thinking & assumptions; to be conf
 /* 01 — Cover */
 export function SlideCover(p: P) {
   return (
-    <Slide id="cover" tone="dark" bg={A.coverHero} bgPosition="right top" {...p}>
+    <Slide id="cover" tone="dark" bg={A.coverHero} bgPosition="right top" bgBrand {...p}>
       <div className="relative flex min-h-0 flex-1 items-center">
         <R d={2} a="fade" className="absolute right-0 top-[7vh] z-10 w-[19vw]">
-          <img src={A.tagline} alt="Forward, together." className="w-full object-contain" />
+          <img src={A.tagline} alt="Forward, together." className="on-dark-img w-full object-contain" />
         </R>
         <div className="relative z-10 max-w-[62vw]">
           <R a="mask">
-            <h1 className="deck-title-lg text-white">EMEA Strategy Review</h1>
+            <h1 className="deck-title-lg text-on-dark">EMEA Strategy Review</h1>
           </R>
           <R d={4}>
-            <p className="deck-body mt-[3vh] text-white/80">August, 2026</p>
+            <p className="deck-body mt-[3vh] text-on-dark/80">August, 2026</p>
           </R>
         </div>
       </div>
@@ -52,7 +52,7 @@ function Donut() {
           rotated to start just past the EMEA sliver's slot, so the sliver's
           empty space at 12 o'clock is reserved for the whole sweep. The
           EMEA sliver draws into that reserved gap as a second step; its
-          delay is tuned to when the front-loaded purple sweep LOOKS done
+          delay is tuned to when the front-loaded brand-colour sweep LOOKS done
           (its last stretch is an imperceptible crawl), not its nominal
           end time, so the hand-off reads as immediate. The two arcs cover
           disjoint parts of the ring, so the slight overlap in time can
@@ -178,7 +178,7 @@ function FlowConnector() {
   // zero-size box to nothing. So the clip-path (wipe/wipeY) lines animate
   // directly on the span itself, which has real geometry, instead of via R.
   const active = useActive();
-  const line = "absolute bg-white/60";
+  const line = "absolute bg-on-dark/60";
   const arrow =
     "absolute right-0 h-0 w-0 -translate-y-1/2 border-y-[8px] border-l-[14px] border-y-transparent border-l-white/75";
   const delay = (d: number): CSSProperties => ({ animationDelay: `${d * 90}ms` });
@@ -249,27 +249,27 @@ export function SlideOptions(p: P) {
     >
       <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[2vw] lg:grid-cols-[1.45fr_1fr]">
         {/* flow */}
-        <div className="border border-white/30 bg-white/5 p-[1.6vw]">
+        <div className="border border-on-dark/30 bg-on-dark/5 p-[1.6vw]">
           <div className="grid grid-cols-[1fr_0.5fr_1.2fr] items-center gap-y-[2.4vh]">
             <R d={1} a="rise" className="row-span-2">
-              <article className="border border-white/45 bg-white/8 p-[1.6vw]">
-                <p className="deck-body font-bold text-white">EMEA Organization</p>
-                <p className="deck-small mt-[0.8vh] text-white/80">~166 FTEs &amp; $95 MM OPEX</p>
+              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.6vw]">
+                <p className="deck-body font-bold text-on-dark">EMEA Organization</p>
+                <p className="deck-small mt-[0.8vh] text-on-dark/80">~166 FTEs &amp; $95 MM OPEX</p>
               </article>
             </R>
             <div className="row-span-2 h-full self-stretch">
               <FlowConnector />
             </div>
             <R d={FLOW_D.box2} a="rise">
-              <article className="border border-white/45 bg-white/8 p-[1.4vw]">
-                <p className="deck-body font-bold text-white">Global Clin Ops and Tech Ops</p>
-                <p className="deck-small mt-[0.6vh] text-white/80">~51 FTEs &amp; ~$25 MM annual OPEX</p>
+              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw]">
+                <p className="deck-body font-bold text-on-dark">Global Clin Ops and Tech Ops</p>
+                <p className="deck-small mt-[0.6vh] text-on-dark/80">~51 FTEs &amp; ~$25 MM annual OPEX</p>
               </article>
             </R>
             <R d={FLOW_D.box3} a="rise">
-              <article className="border border-white/45 bg-white/8 p-[1.4vw]">
-                <p className="deck-body font-bold text-white">EMEA commercialisation engine</p>
-                <p className="deck-small mt-[0.6vh] text-white/80">~ 115 FTEs &amp; ~$70 MM annual OPEX</p>
+              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw]">
+                <p className="deck-body font-bold text-on-dark">EMEA commercialisation engine</p>
+                <p className="deck-small mt-[0.6vh] text-on-dark/80">~ 115 FTEs &amp; ~$70 MM annual OPEX</p>
               </article>
             </R>
           </div>
@@ -277,22 +277,22 @@ export function SlideOptions(p: P) {
 
         {/* options panel */}
         <R d={FLOW_D.panel4} a="rise">
-          <div className="border border-white/30 bg-white/12 p-[1.8vw]">
+          <div className="border border-on-dark/30 bg-on-dark/12 p-[1.8vw]">
             <p className="deck-body font-bold text-sky-light">
               Continued commercialization options improve EBITDA
             </p>
             <div className="mt-[2.2vh] flex items-center gap-[1.2vw]">
-              <span className="deck-small shrink-0 border border-white/55 px-[1vw] py-[0.7vh] text-white">
+              <span className="deck-small shrink-0 border border-on-dark/55 px-[1vw] py-[0.7vh] text-on-dark">
                 Option 1
               </span>
-              <span className="deck-small text-white/85">Product availability, no promotion</span>
+              <span className="deck-small text-on-dark/85">Product availability, no promotion</span>
             </div>
-            <div className="my-[1.6vh] border-t border-dotted border-white/40" />
+            <div className="my-[1.6vh] border-t border-dotted border-on-dark/40" />
             <div className="flex items-center gap-[1.2vw]">
-              <span className="deck-small shrink-0 border border-white/55 px-[1vw] py-[0.7vh] text-white">
+              <span className="deck-small shrink-0 border border-on-dark/55 px-[1vw] py-[0.7vh] text-on-dark">
                 Option 2
               </span>
-              <span className="deck-small text-white/85">Product availability, lean promotion</span>
+              <span className="deck-small text-on-dark/85">Product availability, lean promotion</span>
             </div>
           </div>
         </R>
@@ -405,10 +405,10 @@ export function SlideTradeoffs(p: P) {
 /* 06 — Chapter */
 export function SlideChapter(p: P) {
   return (
-    <Slide id="supporting-documents" tone="dark" bg={A.gradientArc} bgPosition="right bottom" {...p}>
+    <Slide id="supporting-documents" tone="band" bg={A.gradientArc} bgPosition="right bottom" bgBrand {...p}>
       <div className="relative flex min-h-0 flex-1 items-center">
         <R a="mask" className="relative z-10 max-w-[71vw]">
-          <h2 className="deck-title-lg text-white">Supporting Documents – Pre-Read only</h2>
+          <h2 className="deck-title-lg text-on-dark">Supporting Documents – Pre-Read only</h2>
         </R>
       </div>
     </Slide>
@@ -620,12 +620,12 @@ export function SlidePricing(p: P) {
     >
       <div className="flex min-h-0 flex-1 flex-col justify-center">
         <R d={1} a="fade">
-          <div className="grid grid-cols-[1fr_1.6fr_1.6fr] bg-white/5">
+          <div className="grid grid-cols-[1fr_1.6fr_1.6fr] bg-on-dark/5">
             <span />
-            <span className="deck-body bg-brand py-[1vh] text-center font-bold text-white">
+            <span className="deck-body bg-brand py-[1vh] text-center font-bold text-on-dark">
               At Launch
             </span>
-            <span className="deck-body border-l border-white/25 bg-brand py-[1vh] text-center font-bold text-white">
+            <span className="deck-body border-l border-on-dark/25 bg-brand py-[1vh] text-center font-bold text-on-dark">
               By mid-2030s
             </span>
           </div>
@@ -634,15 +634,15 @@ export function SlidePricing(p: P) {
           <R key={row.label} d={1.9 + i * 0.9} a="fade">
             <div
               className={cn(
-                "grid grid-cols-[1fr_1.6fr_1.6fr] items-center border-b border-dashed border-white/25 transition-colors hover:bg-white/8",
-                row.kind === "total" && "border-solid border-white/60 bg-white/10 font-bold",
+                "grid grid-cols-[1fr_1.6fr_1.6fr] items-center border-b border-dashed border-on-dark/25 transition-colors hover:bg-on-dark/8",
+                row.kind === "total" && "border-solid border-on-dark/60 bg-on-dark/10 font-bold",
               )}
             >
-              <span className="deck-body bg-white/8 px-[1vw] py-[1vh] text-white/90">
+              <span className="deck-body bg-on-dark/8 px-[1vw] py-[1vh] text-on-dark/90">
                 {row.label.replace(/1$/, "")}
                 {/1$/.test(row.label) ? <sup>1</sup> : null}
               </span>
-              <span className="deck-body tabular py-[1vh] text-center text-white">{row.values[0]}</span>
+              <span className="deck-body tabular py-[1vh] text-center text-on-dark">{row.values[0]}</span>
               <span className="deck-body tabular py-[1vh] text-center text-sky-light">
                 {row.values[1]}
               </span>
@@ -838,7 +838,7 @@ export function SlideFtes(p: P) {
                       <circle cx="110" cy="14" r="2.5" fill="var(--ink-soft)" />
                       <path d="M110 14 V44" stroke="var(--ink-soft)" strokeWidth="1.5" fill="none" />
                     </svg>
-                    <span className="deck-small bg-brand px-5 py-[0.5vh] font-bold text-white">
+                    <span className="deck-small bg-brand px-5 py-[0.5vh] font-bold text-on-dark">
                       {d.badge}
                     </span>
                     <svg viewBox="0 0 20 22" className="h-[2.8vh] w-[20px]" aria-hidden>

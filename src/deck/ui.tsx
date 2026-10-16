@@ -64,11 +64,15 @@ export function Slide({
   patch,
   bg,
   bgPosition = "right center",
+  bgBrand = false,
 }: {
   id: string;
   index: number;
   total: number;
-  tone?: "light" | "dark";
+  /** light: paper. dark: violet gradient — darkened for legibility when the
+   *  slide carries content, the full bright gradient when it carries `bg`
+   *  artwork. band: the chapter-divider gradient. */
+  tone?: "light" | "dark" | "band";
   title?: ReactNode;
   children: ReactNode;
   footnote?: ReactNode;
@@ -81,6 +85,10 @@ export function Slide({
   /** CSS background-position for `bg` — anchor this at whichever corner holds the
    *  image's important detail, so cover-cropping eats into the plain area instead. */
   bgPosition?: string;
+  /** `bg` is brand artwork — render it as a luminosity pattern over the slide
+   *  gradient (`--img-filter` / `--img-opacity` in styles.css) so the gradient
+   *  supplies the colour. Leave off for photos. */
+  bgBrand?: boolean;
 }) {
   const ref = useRef<HTMLElement | null>(null);
   const [active, setActive] = useState(index === 0);
@@ -111,7 +119,8 @@ export function Slide({
         className={cn(
           "relative isolate flex h-screen w-full shrink-0 snap-start flex-col overflow-hidden",
           tone === "light" && "bg-background text-foreground",
-          tone === "dark" && "surface-dark",
+          tone === "dark" && (bg ? "surface-dark" : "surface-readable"),
+          tone === "band" && "surface-band",
           className,
         )}
       >
@@ -124,6 +133,9 @@ export function Slide({
               backgroundSize: "cover",
               backgroundPosition: bgPosition,
               backgroundRepeat: "no-repeat",
+              filter: bgBrand ? "var(--img-filter)" : undefined,
+              opacity: bgBrand ? "var(--img-opacity)" : undefined,
+              mixBlendMode: bgBrand ? "luminosity" : undefined,
             }}
           />
         ) : null}
@@ -141,15 +153,18 @@ export function Slide({
             patch ? "pt-[2.6vh]" : "pt-[2vh]",
           )}
         >
-          <img
-            src={A.logo}
-            alt="Averon"
-            className={cn("h-[24px] w-auto md:h-[28px]", dark && "brightness-0 invert")}
+          {/* The logo SVG is white; paint it through a mask so it reads as
+              brand violet on light slides and --on-dark on dark ones. */}
+          <span
+            role="img"
+            aria-label="Averon"
+            className={cn("logo-mark h-[24px] md:h-[28px]", dark ? "bg-on-dark" : "bg-brand")}
+            style={{ maskImage: `url(${A.logo})`, WebkitMaskImage: `url(${A.logo})` }}
           />
           <span
             className={cn(
               "deck-note tabular",
-              dark ? "text-white/60" : "text-ink-soft",
+              dark ? "text-on-dark/60" : "text-ink-soft",
             )}
           >
             {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
@@ -162,7 +177,7 @@ export function Slide({
               <h2
                 className={cn(
                   "deck-title max-w-[92%] text-balance",
-                  dark ? "text-white" : "text-brand",
+                  dark ? "text-on-dark" : "text-brand",
                 )}
               >
                 {title}
@@ -172,7 +187,7 @@ export function Slide({
           <div className="mt-[1.6vh] flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
           {footnote ? (
             <R d={6} a="fade">
-              <p className={cn("deck-note pt-[1.2vh]", dark && "text-white/55")}>{footnote}</p>
+              <p className={cn("deck-note pt-[1.2vh]", dark && "text-on-dark/55")}>{footnote}</p>
             </R>
           ) : null}
         </div>
@@ -217,7 +232,7 @@ export function Bullets({
               <span
                 className={cn(
                   obj.sub ? "deck-small" : "deck-body",
-                  dark ? "text-white/90" : "text-ink",
+                  dark ? "text-on-dark/90" : "text-ink",
                 )}
               >
                 {obj.text}
@@ -312,7 +327,7 @@ export function DataTable({
       className={cn(
         "w-full overflow-hidden",
         fill && "flex h-full min-h-0 flex-col",
-        dark ? "text-white" : "text-ink",
+        dark ? "text-on-dark" : "text-ink",
       )}
       onMouseLeave={() => onColHover?.(null)}
     >
@@ -322,13 +337,13 @@ export function DataTable({
             "grid shrink-0 items-end gap-x-1",
             headerBar
               ? cn(
-                  "bg-brand px-2 text-white",
+                  "bg-brand px-2 text-on-dark",
                   dense ? "py-[0.3vh]" : fill ? "py-[0.55vh]" : "py-[0.7vh]",
                 )
               : cn(
                   "border-b-2",
                   dense ? "pb-[0.3vh]" : fill ? "pb-[0.55vh]" : "pb-[0.7vh]",
-                  dark ? "border-white/45" : "border-brand",
+                  dark ? "border-on-dark/45" : "border-brand",
                 ),
           )}
           style={grid}
@@ -337,7 +352,7 @@ export function DataTable({
             className={cn(
               cellType,
               "font-bold",
-              headerBar ? "text-white" : dark ? "text-white" : "text-brand",
+              headerBar ? "text-on-dark" : dark ? "text-on-dark" : "text-brand",
             )}
           >
             {firstColLabel}
@@ -350,7 +365,7 @@ export function DataTable({
                 cellType,
                 "font-bold tabular transition-colors",
                 valueAlign === "center" ? "text-center" : "pr-[0.4vw] text-right",
-                headerBar ? "text-white" : dark ? "text-white/80" : "text-brand",
+                headerBar ? "text-on-dark" : dark ? "text-on-dark/80" : "text-brand",
                 activeCol === i && (headerBar ? "text-sky-light" : dark ? "text-sky-light" : "text-magenta"),
               )}
             >
@@ -420,10 +435,10 @@ export function DataTable({
                     : compact
                       ? "py-[0.22vh]"
                       : "py-[0.5vh]",
-                dark ? "border-white/12 hover:bg-white/8" : "border-rule hover:bg-panel",
-                shadeRows?.includes(row.label) && (dark ? "bg-white/5" : "bg-panel"),
+                dark ? "border-on-dark/12 hover:bg-on-dark/8" : "border-rule hover:bg-panel",
+                shadeRows?.includes(row.label) && (dark ? "bg-on-dark/5" : "bg-panel"),
                 row.kind === "total" &&
-                  (dark ? "bg-white/8 font-bold" : "bg-brand/6 font-bold text-brand"),
+                  (dark ? "bg-on-dark/8 font-bold" : "bg-brand/6 font-bold text-brand"),
               )}
               style={grid}
             >
@@ -497,7 +512,7 @@ export function DataTable({
                       cellType,
                       "tabular transition-colors",
                       valueAlign === "center" ? "text-center" : "pr-[0.4vw] text-right",
-                      row.kind === "pct" && (dark ? "text-white/70" : "text-ink-soft"),
+                      row.kind === "pct" && (dark ? "text-on-dark/70" : "text-ink-soft"),
                       accentRows?.includes(row.label) && "font-bold text-brand",
                       isHighlighted && "-my-[2px] bg-brand-soft py-[0.2vh]",
                       inBox && !isSingleBox && "border-y-2 px-[2px] py-[0.2vh]",
@@ -509,7 +524,7 @@ export function DataTable({
                       inBox && !isSingleBox && ci === boxMin && "border-l-2",
                       inBox && !isSingleBox && ci === boxMax && "border-r-2",
                       activeCol === ci &&
-                        (dark ? "bg-white/12 text-white" : "bg-brand/10 text-brand"),
+                        (dark ? "bg-on-dark/12 text-on-dark" : "bg-brand/10 text-brand"),
                     )}
                     style={inBox && !isSingleBox ? boxTransitionStyle : undefined}
                   >
