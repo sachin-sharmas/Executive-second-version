@@ -67,29 +67,33 @@
 :root {
   --radius: 0.25rem;
 
-  /* ---- Reference palette: deep violet · sky blue · lavender ---- */
-  --brand: oklch(0.36 0.19 285); /* deep violet */
-  --brand-deep: oklch(0.23 0.13 285);
-  --brand-mid: oklch(0.48 0.23 286);
-  --brand-soft: oklch(0.91 0.045 280); /* pale lavender */
-  --highlight: oklch(0.73 0.14 250); /* sky blue */
-  --highlight-strong: oklch(0.48 0.2 283); /* legible violet accent */
+  /* ---- Palette: royal blue · amber (chosen V2). /violet keeps the previous
+     violet · sky palette — see :root[data-theme="violet"] below. ---- */
+  --brand: #1e40af; /* royal blue */
+  --brand-deep: #14246b;
+  --brand-mid: #3358d4;
+  --brand-soft: #dfe6fa; /* pale blue */
+  --highlight: #f5a524; /* amber */
+  --highlight-strong: #a86400; /* amber legible on white */
   --magenta: var(--highlight-strong); /* secondary accent slot (text, markers, boxes) */
   --magenta-bright: var(--highlight);
-  --sky: oklch(0.73 0.14 250);
-  --sky-light: oklch(0.88 0.055 255);
-  --ocean: oklch(0.48 0.2 260);
-  --teal: oklch(0.66 0.15 278);
-  --leaf: oklch(0.78 0.11 293);
-  --ink: oklch(0.23 0.045 283);
-  --ink-soft: oklch(0.46 0.04 278);
-  --rule: oklch(0.85 0.035 277);
-  --panel: oklch(0.96 0.018 278);
+  --sky: #f5a524;
+  --sky-light: #fcd27a;
+  --ocean: #3358d4;
+  --teal: #3358d4;
+  --leaf: color-mix(in oklab, #3358d4 45%, white);
+  --ink: #111a3a;
+  --ink-soft: #4b5578;
+  --rule: #cdd5ec;
+  --panel: #f2f5fc;
   --paper: oklch(1 0 0);
 
-  /* Dark-surface gradients (sky → violet → deep violet) */
-  --deck-dark-gradient: linear-gradient(125deg, var(--sky) 0%, var(--teal) 30%, var(--brand-mid) 58%, var(--brand-deep) 100%);
-  --deck-band-gradient: linear-gradient(125deg, var(--sky) 0%, var(--teal) 24%, var(--brand) 52%, var(--brand-deep) 78%, var(--brand-mid) 100%);
+  /* Dark-surface gradients (light blue → royal blue → deep blue). The light
+     stops are set apart from the accent, which would clash with the brand hue. */
+  --grad-1: #5b8def;
+  --grad-2: #3358d4;
+  --deck-dark-gradient: linear-gradient(125deg, var(--grad-1) 0%, var(--grad-2) 30%, var(--brand-mid) 58%, var(--brand-deep) 100%);
+  --deck-band-gradient: linear-gradient(125deg, var(--grad-1) 0%, var(--grad-2) 24%, var(--brand) 52%, var(--brand-deep) 78%, var(--brand-mid) 100%);
   --deck-readable-gradient: linear-gradient(color-mix(in oklab, var(--brand-deep) 58%, transparent), color-mix(in oklab, var(--brand-deep) 58%, transparent)), var(--deck-dark-gradient);
 
   /* Text / lines on surface-dark slides, and the white logo & tagline art */
@@ -120,6 +124,28 @@
   --border: var(--rule);
   --input: var(--rule);
   --ring: var(--brand);
+}
+
+/* ---- Previous palette: deep violet · sky blue · lavender, served at /violet
+   (src/routes/__root.tsx sets data-theme on <html>). ---- */
+:root[data-theme="violet"] {
+  --brand: oklch(0.36 0.19 285); /* deep violet */
+  --brand-deep: oklch(0.23 0.13 285);
+  --brand-mid: oklch(0.48 0.23 286);
+  --brand-soft: oklch(0.91 0.045 280); /* pale lavender */
+  --highlight: oklch(0.73 0.14 250); /* sky blue */
+  --highlight-strong: oklch(0.48 0.2 283); /* legible violet accent */
+  --sky: oklch(0.73 0.14 250);
+  --sky-light: oklch(0.88 0.055 255);
+  --ocean: oklch(0.48 0.2 260);
+  --teal: oklch(0.66 0.15 278);
+  --leaf: oklch(0.78 0.11 293);
+  --ink: oklch(0.23 0.045 283);
+  --ink-soft: oklch(0.46 0.04 278);
+  --rule: oklch(0.85 0.035 277);
+  --panel: oklch(0.96 0.018 278);
+  --grad-1: var(--sky);
+  --grad-2: var(--teal);
 }
 
 @layer base {
