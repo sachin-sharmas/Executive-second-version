@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Lenis from "lenis";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SLIDES } from "@/deck/slides";
+import { MOBILE_QUERY } from "@/deck/ui";
 
 /** Duration of one slide-to-slide move. */
 const SLIDE_MS = 900;
@@ -18,6 +20,26 @@ export function Deck() {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const [current, setCurrent] = useState(0);
+
+  // Phones use native scroll-snap for swipes: one swipe lands on one slide, and a slide
+  // taller than the screen scrolls inside itself before the next swipe moves on. Lenis
+  // still runs there to ease the arrow / indicator moves; the wheel, touch and key
+  // handlers below are desktop-only.
+  // Only read inside effects (never rendered), so the lazy browser-only initial value
+  // can't cause a hydration mismatch.
+  const [mobile, setMobile] = useState(
+    () => typeof window !== "undefined" && window.matchMedia(MOBILE_QUERY).matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_QUERY);
+    const sync = () => setMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const mobileRef = useRef(mobile);
+  mobileRef.current = mobile;
 
   // The slide the deck is resting on or travelling to. Keys and wheel step from
   // this, not from `current`, so quick presses never target a stale slide.
@@ -56,14 +78,16 @@ export function Deck() {
       syncTouch: false,
       autoRaf: true,
     });
-    lenis.stop(); // no user-driven scrolling; scrollTo(..., { force: true }) still runs
+    // Desktop: no user-driven scrolling; scrollTo(..., { force: true }) still runs.
+    // Phones: leave touch to the browser (native momentum + scroll-snap).
+    if (!mobile) lenis.stop();
     lenisRef.current = lenis;
 
     return () => {
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [mobile]);
 
   const goTo = useCallback((i: number, opts?: { immediate?: boolean }) => {
     const idx = Math.max(0, Math.min(SLIDES.length - 1, i));
@@ -76,8 +100,12 @@ export function Deck() {
       return;
     }
     busyRef.current = true;
+    // CSS scroll-snap would fight the eased move, so pause it until the move lands.
+    const wrapper = scrollerRef.current;
+    if (mobileRef.current && wrapper) wrapper.style.scrollSnapType = "none";
     const release = () => {
       busyRef.current = false;
+      if (wrapper) wrapper.style.scrollSnapType = "";
     };
     // Safety net in case onComplete never fires (e.g. already at the target).
     const timer = setTimeout(release, SLIDE_MS + 150);
@@ -89,7 +117,7 @@ export function Deck() {
       onComplete: () => {
         clearTimeout(timer);
         // Let trackpad inertia from the triggering gesture die down first.
-        setTimeout(release, WHEEL_COOLDOWN_MS);
+        setTimeout(release, mobileRef.current ? 0 : WHEEL_COOLDOWN_MS);
       },
     });
   }, []);
@@ -98,7 +126,7 @@ export function Deck() {
   // flick still counts, and anything arriving mid-move is swallowed.
   useEffect(() => {
     const wrapper = scrollerRef.current;
-    if (!wrapper) return;
+    if (mobile || !wrapper) return;
     let acc = 0;
     let last = 0;
     const onWheel = (e: WheelEvent) => {
@@ -116,12 +144,12 @@ export function Deck() {
     };
     wrapper.addEventListener("wheel", onWheel, { passive: false });
     return () => wrapper.removeEventListener("wheel", onWheel);
-  }, [goTo]);
+  }, [goTo, mobile]);
 
   // Touch: a vertical swipe moves one slide.
   useEffect(() => {
     const wrapper = scrollerRef.current;
-    if (!wrapper) return;
+    if (mobile || !wrapper) return;
     let startY: number | null = null;
     const onStart = (e: TouchEvent) => {
       startY = e.touches[0]?.clientY ?? null;
@@ -145,10 +173,11 @@ export function Deck() {
       wrapper.removeEventListener("touchmove", onMove);
       wrapper.removeEventListener("touchend", onEnd);
     };
-  }, [goTo]);
+  }, [goTo, mobile]);
 
   // Keys always act, even mid-move: Lenis simply retargets the animation.
   useEffect(() => {
+    if (mobile) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       // Holding a key down must not race through the deck: one press, one slide.
@@ -172,12 +201,13 @@ export function Deck() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [goTo]);
+  }, [goTo, mobile]);
 
   // A resize changes every slide's offset, and a background tab pauses the
   // animation clock; in both cases re-align to the target slide so the
   // viewport never rests across two slides.
   useEffect(() => {
+    if (mobile) return;
     const realign = () => goTo(targetRef.current, { immediate: true });
     const onVisibility = () => {
       if (document.visibilityState === "visible") realign();
@@ -188,17 +218,20 @@ export function Deck() {
       window.removeEventListener("resize", realign);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [goTo]);
+  }, [goTo, mobile]);
 
   return (
-    <main className="relative -left-[2px] -top-px h-screen w-full">
-      <div ref={scrollerRef} className="h-screen w-full overflow-hidden">
+    <main className="relative -left-[2px] -top-px h-screen w-full max-md:left-0 max-md:top-0 max-md:h-dvh">
+      <div
+        ref={scrollerRef}
+        className="h-screen w-full overflow-hidden max-md:h-dvh max-md:snap-y max-md:snap-mandatory max-md:overflow-y-auto max-md:overflow-x-hidden max-md:overscroll-contain"
+      >
         <div ref={contentRef}>{slides}</div>
       </div>
 
       <nav
         aria-label="Slide navigation"
-        className="fixed right-[1.4vw] top-1/2 z-50 hidden -translate-y-1/2 flex-col items-end gap-3 mix-blend-difference md:flex"
+        className="fixed right-[1.4vw] top-1/2 z-50 flex -translate-y-1/2 flex-col items-end gap-3 mix-blend-difference max-md:right-[3px] max-md:gap-2"
       >
         {SLIDES.map((s, i) => (
           <button
@@ -206,11 +239,11 @@ export function Deck() {
             onClick={() => goTo(i)}
             aria-label={s.label}
             aria-current={current === i}
-            className="group flex items-center gap-3"
+            className="group flex items-center gap-3 max-md:py-1"
           >
             <span
               className={cn(
-                "deck-note whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover:opacity-100",
+                "deck-note whitespace-nowrap max-md:hidden opacity-0 transition-opacity duration-200 group-hover:opacity-100",
                 "text-white",
               )}
             >
@@ -219,12 +252,32 @@ export function Deck() {
             <span
               className={cn(
                 "block h-[2px] transition-all duration-300",
-                current === i ? "w-[38px] bg-white" : "w-[16px] bg-white/45 group-hover:w-[26px]",
+                current === i
+                  ? "w-[38px] bg-white max-md:w-3"
+                  : "w-[16px] bg-white/45 group-hover:w-[26px] max-md:w-2 max-md:group-hover:w-2",
               )}
             />
           </button>
         ))}
       </nav>
+
+      {/* Phones: previous / next arrows (desktop uses the arrow keys). */}
+      <div className="fixed bottom-4 right-4 z-50 flex gap-2 md:hidden">
+        {[
+          { label: "Previous slide", Icon: ChevronUp, to: current - 1, off: current === 0 },
+          { label: "Next slide", Icon: ChevronDown, to: current + 1, off: current === SLIDES.length - 1 },
+        ].map(({ label, Icon, to, off }) => (
+          <button
+            key={label}
+            aria-label={label}
+            disabled={off}
+            onClick={() => goTo(to)}
+            className="grid h-10 w-10 place-items-center rounded-full bg-brand-deep/85 text-white shadow-lg backdrop-blur transition-opacity disabled:opacity-30"
+          >
+            <Icon className="h-5 w-5" />
+          </button>
+        ))}
+      </div>
 
       <div className="pointer-events-none fixed bottom-0 left-0 z-50 h-[3px] w-full bg-transparent">
         <div

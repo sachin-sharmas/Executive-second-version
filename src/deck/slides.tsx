@@ -14,7 +14,7 @@ import {
   YEARS_10,
   YEARS_11,
 } from "./data";
-import { Bullets, DataTable, R, Slide, useActive } from "./ui";
+import { Bullets, DataTable, MobileScroll, R, Slide, useActive } from "./ui";
 
 type P = { index: number; total: number; onActive: (i: number) => void };
 
@@ -24,11 +24,15 @@ const FOOT = "All figures reflect preliminary thinking & assumptions; to be conf
 export function SlideCover(p: P) {
   return (
     <Slide id="cover" tone="dark" bg={A.coverHero} bgPosition="right top" bgBrand {...p}>
-      <div className="relative flex min-h-0 flex-1 items-center">
-        <R d={2} a="fade" className="absolute right-0 top-[7vh] z-10 w-[19vw]">
+      <div className="relative flex min-h-0 flex-1 items-center max-md:flex-col max-md:items-start max-md:justify-center">
+        <R
+          d={2}
+          a="fade"
+          className="absolute right-0 top-[7vh] z-10 w-[19vw] max-md:static max-md:order-last max-md:mt-10 max-md:w-[44vw]"
+        >
           <img src={A.tagline} alt="Forward, together." className="on-dark-img w-full object-contain" />
         </R>
-        <div className="relative z-10 max-w-[62vw]">
+        <div className="relative z-10 max-w-[62vw] max-md:max-w-full">
           <R a="mask">
             <h1 className="deck-title-lg text-on-dark">EMEA Strategy Review</h1>
           </R>
@@ -111,7 +115,7 @@ export function SlideRecommend(p: P) {
       footnote={FOOT}
       {...p}
     >
-      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[2.5vw] lg:grid-cols-[1.45fr_1fr]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[2.5vw] max-md:gap-8 lg:grid-cols-[1.45fr_1fr]">
         <div className="lg:border-r lg:border-dashed lg:border-rule lg:pr-[2.2vw]">
           <Bullets
             items={[
@@ -135,7 +139,7 @@ export function SlideRecommend(p: P) {
           />
         </div>
         <div className="flex flex-col items-center">
-          <R d={2} a="fade" className="h-[30vh] w-[30vh]">
+          <R d={2} a="fade" className="h-[30vh] w-[30vh] max-md:h-[180px] max-md:w-[180px]">
             <Donut />
           </R>
           <R d={4} className="mt-[2vh] space-y-[0.9vh]">
@@ -247,27 +251,31 @@ export function SlideOptions(p: P) {
       footnote={FOOT}
       {...p}
     >
-      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[2vw] lg:grid-cols-[1.45fr_1fr]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[2vw] max-md:gap-5 lg:grid-cols-[1.45fr_1fr]">
         {/* flow */}
-        <div className="border border-on-dark/30 bg-on-dark/5 p-[1.6vw]">
-          <div className="grid grid-cols-[1fr_0.5fr_1.2fr] items-center gap-y-[2.4vh]">
-            <R d={1} a="rise" className="row-span-2">
-              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.6vw]">
+        <div className="border border-on-dark/30 bg-on-dark/5 p-[1.6vw] max-md:p-3">
+          <div className="grid grid-cols-[1fr_0.5fr_1.2fr] items-center gap-y-[2.4vh] max-md:grid-cols-1 max-md:gap-y-3">
+            <R d={1} a="rise" className="row-span-2 max-md:row-span-1">
+              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.6vw] max-md:p-3">
                 <p className="deck-body font-bold text-on-dark">EMEA Organization</p>
                 <p className="deck-small mt-[0.8vh] text-on-dark/80">~166 FTEs &amp; $95 MM OPEX</p>
               </article>
             </R>
-            <div className="row-span-2 h-full self-stretch">
+            <div className="row-span-2 h-full self-stretch max-md:hidden">
               <FlowConnector />
             </div>
+            {/* phones stack the flow top-to-bottom, so the connector becomes a single down arrow */}
+            <div aria-hidden className="flex justify-center md:hidden">
+              <span className="h-0 w-0 border-x-[9px] border-t-[12px] border-x-transparent border-t-white/75" />
+            </div>
             <R d={FLOW_D.box2} a="rise">
-              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw]">
+              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw] max-md:p-3">
                 <p className="deck-body font-bold text-on-dark">Global Clin Ops and Tech Ops</p>
                 <p className="deck-small mt-[0.6vh] text-on-dark/80">~51 FTEs &amp; ~$25 MM annual OPEX</p>
               </article>
             </R>
             <R d={FLOW_D.box3} a="rise">
-              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw]">
+              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw] max-md:p-3">
                 <p className="deck-body font-bold text-on-dark">EMEA commercialisation engine</p>
                 <p className="deck-small mt-[0.6vh] text-on-dark/80">~ 115 FTEs &amp; ~$70 MM annual OPEX</p>
               </article>
@@ -277,19 +285,19 @@ export function SlideOptions(p: P) {
 
         {/* options panel */}
         <R d={FLOW_D.panel4} a="rise">
-          <div className="border border-on-dark/30 bg-on-dark/12 p-[1.8vw]">
+          <div className="border border-on-dark/30 bg-on-dark/12 p-[1.8vw] max-md:p-4">
             <p className="deck-body font-bold text-sky-light">
               Continued commercialization options improve EBITDA
             </p>
-            <div className="mt-[2.2vh] flex items-center gap-[1.2vw]">
-              <span className="deck-small shrink-0 border border-on-dark/55 px-[1vw] py-[0.7vh] text-on-dark">
+            <div className="mt-[2.2vh] flex items-center gap-[1.2vw] max-md:mt-4 max-md:gap-3">
+              <span className="deck-small shrink-0 border border-on-dark/55 px-[1vw] py-[0.7vh] text-on-dark max-md:px-2.5 max-md:py-1">
                 Option 1
               </span>
               <span className="deck-small text-on-dark/85">Product availability, no promotion</span>
             </div>
-            <div className="my-[1.6vh] border-t border-dotted border-on-dark/40" />
-            <div className="flex items-center gap-[1.2vw]">
-              <span className="deck-small shrink-0 border border-on-dark/55 px-[1vw] py-[0.7vh] text-on-dark">
+            <div className="my-[1.6vh] border-t border-dotted border-on-dark/40 max-md:my-3" />
+            <div className="flex items-center gap-[1.2vw] max-md:gap-3">
+              <span className="deck-small shrink-0 border border-on-dark/55 px-[1vw] py-[0.7vh] text-on-dark max-md:px-2.5 max-md:py-1">
                 Option 2
               </span>
               <span className="deck-small text-on-dark/85">Product availability, lean promotion</span>
@@ -318,7 +326,7 @@ export function SlideLean(p: P) {
       }
       {...p}
     >
-      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[2.5vw] lg:grid-cols-[1.25fr_1fr]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[2.5vw] max-md:gap-8 lg:grid-cols-[1.25fr_1fr]">
         <div className="flex flex-col justify-center gap-[2.4vh]">
           <div>
             <R d={2}>
@@ -381,17 +389,19 @@ export function SlideTradeoffs(p: P) {
       title="Key trade offs: Reputational & cultural risk, reduced influence with medical community; recommend proceeding"
       {...p}
     >
-      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[3vw] md:grid-cols-2">
+      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[3vw] max-md:gap-6 md:grid-cols-2">
         {cards.map((card, i) => (
           <R key={i} d={2 + i * 2} a="rise">
-            <div className="relative pt-[9vh]">
-              <span className="absolute left-[2.4vw] top-0 z-10 grid h-[18vh] w-[18vh] place-items-center rounded-full bg-white p-[1.3vh] shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
-                <span className="grid h-full w-full place-items-center rounded-full border-[7px] border-brand bg-white">
-                  <img src={card.icon} alt="" className="h-[8.5vh] w-[8.5vh] object-contain" />
+            <div className="relative pt-[9vh] max-md:pt-10">
+              <span className="absolute left-[2.4vw] top-0 z-10 grid h-[18vh] w-[18vh] place-items-center rounded-full bg-white p-[1.3vh] shadow-[0_10px_30px_rgba(0,0,0,0.25)] max-md:left-5 max-md:h-20 max-md:w-20 max-md:p-1.5">
+                <span className="grid h-full w-full place-items-center rounded-full border-[7px] border-brand bg-white max-md:border-[5px]">
+                  <img src={card.icon} alt="" className="h-[8.5vh] w-[8.5vh] object-contain max-md:h-9 max-md:w-9" />
                 </span>
               </span>
-              <div className="min-h-[32vh] bg-white px-[2.6vw] pb-[3.4vh] pt-[11.5vh]">
-                <p className="text-[clamp(25px,1.85vw,36px)] leading-[1.32] text-ink">{card.text}</p>
+              <div className="min-h-[32vh] bg-white px-[2.6vw] pb-[3.4vh] pt-[11.5vh] max-md:min-h-0 max-md:px-5 max-md:pb-6 max-md:pt-14">
+                <p className="text-[clamp(25px,1.85vw,36px)] leading-[1.32] text-ink max-md:text-base max-md:leading-[1.38]">
+                  {card.text}
+                </p>
               </div>
             </div>
           </R>
@@ -407,7 +417,7 @@ export function SlideChapter(p: P) {
   return (
     <Slide id="supporting-documents" tone="band" bg={A.gradientArc} bgPosition="right bottom" bgBrand {...p}>
       <div className="relative flex min-h-0 flex-1 items-center">
-        <R a="mask" className="relative z-10 max-w-[71vw]">
+        <R a="mask" className="relative z-10 max-w-[71vw] max-md:max-w-full">
           <h2 className="deck-title-lg text-on-dark">Supporting Documents – Pre-Read only</h2>
         </R>
       </div>
@@ -472,14 +482,14 @@ function Breakeven2032Body() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <R a="rise" className={blurCls}>
-        <h2 className="deck-title max-w-[92%] text-balance text-brand">
+        <h2 className="deck-title max-w-[92%] text-balance text-brand max-md:max-w-full">
           Cumulative break-even in 2032 mainly supported by significant revenue contribution from
           GTx
         </h2>
       </R>
       <div className="mt-[1.6vh] flex min-h-0 flex-1 flex-col">
-        <R d={1} className="relative z-20 flex justify-end">
-          <div className="relative">
+        <R d={1} className="relative z-20 flex justify-end max-md:pt-14">
+          <div className="relative max-md:w-full">
             <div className="flex border border-brand bg-paper">
               {(
                 [
@@ -494,7 +504,7 @@ function Breakeven2032Body() {
                     setNudge(false);
                   }}
                   className={cn(
-                    "deck-cell px-5 py-2 transition-colors",
+                    "deck-cell px-5 py-2 transition-colors max-md:flex-1 max-md:px-2 max-md:py-1.5",
                     view === v ? "bg-brand text-primary-foreground" : "text-brand hover:bg-brand/8",
                   )}
                 >
@@ -529,18 +539,20 @@ function Breakeven2032Body() {
             </div>
           </div>
         </R>
-        <div className={cn("mt-[1.2vh] flex min-h-0 flex-1 items-start", blurCls)}>
-          <DataTable
-            columns={YEARS_11}
-            rows={rows}
-            firstColLabel="USDm"
-            activeCol={col}
-            onColHover={setCol}
-            colWidth="minmax(52px, 1fr)"
-            labelWidth="minmax(190px, 1.5fr)"
-            headerBar
-            compact
-          />
+        <div className={cn("mt-[1.2vh] flex min-h-0 flex-1 items-start max-md:mt-4", blurCls)}>
+          <MobileScroll minWidth={700}>
+            <DataTable
+              columns={YEARS_11}
+              rows={rows}
+              firstColLabel="USDm"
+              activeCol={col}
+              onColHover={setCol}
+              colWidth="minmax(52px, 1fr)"
+              labelWidth="minmax(190px, 1.5fr)"
+              headerBar
+              compact
+            />
+          </MobileScroll>
         </div>
       </div>
     </div>
@@ -566,42 +578,47 @@ export function SlideBreakeven2034(p: P) {
       footnote="G&A costs have not been allocated to the individual countries; All other infrastructure costs are included"
       {...p}
     >
-      <div className="flex min-h-0 flex-1 flex-col justify-center gap-[2.2vh]">
+      <div className="flex min-h-0 flex-1 flex-col justify-center gap-[2.2vh] max-md:justify-start max-md:gap-4">
         <R d={1} className="flex justify-end">
           <p className="deck-small flex items-center gap-2.5 text-ink">
             <span className="h-[1em] w-[1em] shrink-0 rounded-sm bg-brand-soft" />
             Represents cumulative break-even
           </p>
         </R>
-        <DataTable
-          columns={YEARS_10}
-          rows={NET_SALES}
-          firstColLabel="Net Sales"
-          flags={FLAGS}
-          activeCol={col}
-          onColHover={setCol}
-          labelWidth="minmax(230px, 1.4fr)"
-          headerBar
-          compact
-        />
-        <DataTable
-          columns={YEARS_10}
-          rows={EBITDA_ROWS}
-          firstColLabel="EBITDA"
-          flags={FLAGS}
-          activeCol={col}
-          onColHover={setCol}
-          labelWidth="minmax(230px, 1.4fr)"
-          headerBar
-          compact
-          highlight={{
-            Germany: [8],
-            UK: [7],
-            Spain: [7],
-            "All other countries": [6],
-            "Total EMEA": [8],
-          }}
-        />
+        {/* one shared scroller so both tables pan together on phones */}
+        <MobileScroll minWidth={640}>
+          <div className="md:contents max-md:flex max-md:flex-col max-md:gap-6">
+            <DataTable
+              columns={YEARS_10}
+              rows={NET_SALES}
+              firstColLabel="Net Sales"
+              flags={FLAGS}
+              activeCol={col}
+              onColHover={setCol}
+              labelWidth="minmax(230px, 1.4fr)"
+              headerBar
+              compact
+            />
+            <DataTable
+              columns={YEARS_10}
+              rows={EBITDA_ROWS}
+              firstColLabel="EBITDA"
+              flags={FLAGS}
+              activeCol={col}
+              onColHover={setCol}
+              labelWidth="minmax(230px, 1.4fr)"
+              headerBar
+              compact
+              highlight={{
+                Germany: [8],
+                UK: [7],
+                Spain: [7],
+                "All other countries": [6],
+                "Total EMEA": [8],
+              }}
+            />
+          </div>
+        </MobileScroll>
       </div>
     </Slide>
   );
@@ -618,9 +635,9 @@ export function SlidePricing(p: P) {
       footnote="1. Prices represent direct pricing. (team is proposing import model initially)"
       {...p}
     >
-      <div className="flex min-h-0 flex-1 flex-col justify-center">
+      <div className="flex min-h-0 flex-1 flex-col justify-center max-md:justify-start">
         <R d={1} a="fade">
-          <div className="grid grid-cols-[1fr_1.6fr_1.6fr] bg-on-dark/5">
+          <div className="grid grid-cols-[1fr_1.6fr_1.6fr] bg-on-dark/5 max-md:grid-cols-[1.25fr_1fr_1fr]">
             <span />
             <span className="deck-body bg-brand py-[1vh] text-center font-bold text-on-dark">
               At Launch
@@ -634,16 +651,16 @@ export function SlidePricing(p: P) {
           <R key={row.label} d={1.9 + i * 0.9} a="fade">
             <div
               className={cn(
-                "grid grid-cols-[1fr_1.6fr_1.6fr] items-center border-b border-dashed border-on-dark/25 transition-colors hover:bg-on-dark/8",
+                "grid grid-cols-[1fr_1.6fr_1.6fr] items-center max-md:grid-cols-[1.25fr_1fr_1fr] border-b border-dashed border-on-dark/25 transition-colors hover:bg-on-dark/8",
                 row.kind === "total" && "border-solid border-on-dark/60 bg-on-dark/10 font-bold",
               )}
             >
-              <span className="deck-body bg-on-dark/8 px-[1vw] py-[1vh] text-on-dark/90">
+              <span className="deck-body bg-on-dark/8 px-[1vw] py-[1vh] text-on-dark/90 max-md:px-2 max-md:py-2">
                 {row.label.replace(/1$/, "")}
                 {/1$/.test(row.label) ? <sup>1</sup> : null}
               </span>
-              <span className="deck-body tabular py-[1vh] text-center text-on-dark">{row.values[0]}</span>
-              <span className="deck-body tabular py-[1vh] text-center text-sky-light">
+              <span className="deck-body tabular py-[1vh] text-center text-on-dark max-md:py-2">{row.values[0]}</span>
+              <span className="deck-body tabular py-[1vh] text-center text-sky-light max-md:py-2">
                 {row.values[1]}
               </span>
             </div>
@@ -657,7 +674,7 @@ export function SlidePricing(p: P) {
 /* 10 — Cumulative P&L scenarios */
 export function SlideCumulativePL(p: P) {
   const [col, setCol] = useState<number | null>(5);
-  const grid = "grid-cols-[minmax(180px,1fr)_repeat(6,minmax(110px,1fr))]";
+  const grid = "grid-cols-[minmax(180px,1fr)_repeat(6,minmax(110px,1fr))] max-md:grid-cols-7";
   return (
     <Slide
       id="cumulative-pl"
@@ -672,20 +689,21 @@ export function SlideCumulativePL(p: P) {
       }
       {...p}
     >
-      <div className="flex min-h-0 flex-1 flex-col justify-center">
+      <div className="flex min-h-0 flex-1 flex-col justify-center max-md:justify-start">
+        <MobileScroll minWidth={640}>
         {/* Incremental only bracket over the last two columns — timed to land
             together with the connector arrow + its border box below, not
             with the table, so all three read as one "reveal" beat. */}
         <R d={20} a="fade" style={{ animationDuration: "1s" }}>
           <div className={cn("grid gap-x-1", grid)}>
             <div className="col-span-5" />
-            <div className="relative col-span-2 pb-[0.6vh] pt-[1.6vh] text-center">
+            <div className="relative col-span-2 pb-[0.6vh] pt-[1.6vh] text-center max-md:pb-1 max-md:pt-3">
               <span className="deck-small font-bold text-brand">Incremental only</span>
             </div>
           </div>
         </R>
 
-        <div className={cn("relative grid", grid)}>
+        <div className={cn("relative grid [--brk:5.22vh] max-md:[--brk:35px]", grid)}>
           <div className="col-span-7 grid">
             <div className="col-start-1 row-start-1">
               <DataTable
@@ -696,6 +714,8 @@ export function SlideCumulativePL(p: P) {
                 onColHover={setCol}
                 colWidth="minmax(110px, 1fr)"
                 labelWidth="minmax(180px, 1fr)"
+                mobileLabelWidth="minmax(0, 1fr)"
+                mobileColWidth="minmax(0, 1fr)"
                 boxes={{ EBITDA: [[0], [1, 2, 3]] }}
                 boxDelay={8}
                 boxDuration="1.1s"
@@ -748,7 +768,12 @@ export function SlideCumulativePL(p: P) {
             <div
               aria-hidden
               className="pointer-events-none absolute border-2 border-brand"
-              style={{ left: "71.5%", width: "28.5%", top: "-5.22vh", height: "calc(100% + 5.22vh)" }}
+              style={{
+                left: "71.5%",
+                width: "28.5%",
+                top: "calc(-1 * var(--brk))",
+                height: "calc(100% + var(--brk))",
+              }}
             />
           </R>
         </div>
@@ -756,15 +781,16 @@ export function SlideCumulativePL(p: P) {
         {/* savings callout, centered under the connector's drop point —
             lands after the arrow (d=20, 1.3s duration) has finished drawing. */}
         <R d={30} a="rise" style={{ animationDuration: "1.2s" }}>
-          <div className="relative mt-[3vh] h-[5.2vh] w-full">
+          <div className="relative mt-[3vh] h-[5.2vh] w-full max-md:mt-5 max-md:h-12">
             <p
-              className="deck-body absolute w-max -translate-x-1/2 border-2 border-magenta bg-brand/8 px-6 py-[1vh] font-bold text-brand"
+              className="deck-body absolute w-max -translate-x-1/2 border-2 border-magenta bg-brand/8 px-6 py-[1vh] font-bold text-brand max-md:px-3"
               style={{ left: "26%" }}
             >
               Potential savings of ~140m to ~180m
             </p>
           </div>
         </R>
+        </MobileScroll>
       </div>
     </Slide>
   );
@@ -773,7 +799,8 @@ export function SlideCumulativePL(p: P) {
 /* 11 — FTEs */
 export function SlideFtes(p: P) {
   const [col, setCol] = useState<number | null>(3);
-  const grid = "grid-cols-[minmax(200px,1.3fr)_repeat(4,minmax(120px,1fr))]";
+  const grid =
+    "grid-cols-[minmax(200px,1.3fr)_repeat(4,minmax(120px,1fr))] max-md:grid-cols-[1.3fr_repeat(4,1fr)]";
   return (
     <Slide
       id="ftes"
@@ -782,7 +809,8 @@ export function SlideFtes(p: P) {
       footnote="1. All figures reflect preliminary thinking & assumptions; to be confirmed"
       {...p}
     >
-      <div className="flex min-h-0 flex-1 flex-col justify-center">
+      <div className="flex min-h-0 flex-1 flex-col justify-center max-md:justify-start">
+        <MobileScroll minWidth={600}>
         <DataTable
           columns={FTE_COLS}
           rows={FTES}
@@ -791,6 +819,8 @@ export function SlideFtes(p: P) {
           onColHover={setCol}
           colWidth="minmax(120px, 1fr)"
           labelWidth="minmax(200px, 1.3fr)"
+          mobileLabelWidth="minmax(0, 1.3fr)"
+          mobileColWidth="minmax(0, 1fr)"
           indent={[
             "Clinical Development",
             "Clinical Operations",
@@ -811,7 +841,7 @@ export function SlideFtes(p: P) {
             {/* each delta sits on the boundary between two data columns; this grid
                 splits each real data column in half so col-span-2 always runs
                 center-to-center between the two Total values it connects */}
-            <div className="grid gap-x-1" style={{ gridTemplateColumns: "repeat(8, minmax(60px, 1fr))" }}>
+            <div className="grid grid-cols-[repeat(8,minmax(60px,1fr))] gap-x-1 max-md:grid-cols-8">
               {FTE_DELTAS.map((d, i) => (
                 <R
                   key={d.badge}
@@ -838,14 +868,14 @@ export function SlideFtes(p: P) {
                       <circle cx="110" cy="14" r="2.5" fill="var(--ink-soft)" />
                       <path d="M110 14 V44" stroke="var(--ink-soft)" strokeWidth="1.5" fill="none" />
                     </svg>
-                    <span className="deck-small bg-brand px-5 py-[0.5vh] font-bold text-on-dark">
+                    <span className="deck-small bg-brand px-5 py-[0.5vh] font-bold text-on-dark max-md:px-3">
                       {d.badge}
                     </span>
                     <svg viewBox="0 0 20 22" className="h-[2.8vh] w-[20px]" aria-hidden>
                       <circle cx="10" cy="4" r="2.5" fill="var(--ink-soft)" />
                       <path d="M10 4 V22" stroke="var(--ink-soft)" strokeWidth="1.5" fill="none" />
                     </svg>
-                    <p className="deck-cell w-full rounded-sm border border-rule bg-white px-4 py-[0.9vh] text-center text-ink shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+                    <p className="deck-cell w-full rounded-sm border border-rule bg-white px-4 py-[0.9vh] text-center text-ink shadow-[0_2px_8px_rgba(0,0,0,0.06)] max-md:px-2 max-md:py-1.5">
                       {d.detail}
                     </p>
                   </div>
@@ -854,7 +884,7 @@ export function SlideFtes(p: P) {
             </div>
           </div>
         </div>
-
+        </MobileScroll>
       </div>
     </Slide>
   );

@@ -183,6 +183,11 @@
   letter-spacing: -0.005em;
   line-height: 1.08;
   font-size: clamp(32px, 3.15vw, 54px);
+
+  @media (max-width: 767.98px) {
+    font-size: 24px;
+    line-height: 1.15;
+  }
 }
 
 @utility deck-title-lg {
@@ -191,6 +196,10 @@
   letter-spacing: -0.008em;
   line-height: 1.05;
   font-size: clamp(52px, 6.4vw, 112px);
+
+  @media (max-width: 767.98px) {
+    font-size: 38px;
+  }
 }
 
 @utility deck-metric {
@@ -205,21 +214,41 @@
 @utility deck-body {
   font-size: clamp(23px, 1.55vw, 30px);
   line-height: 1.34;
+
+  @media (max-width: 767.98px) {
+    font-size: 16px;
+    line-height: 1.38;
+  }
 }
 
 @utility deck-small {
   font-size: clamp(21px, 1.32vw, 26px);
   line-height: 1.33;
+
+  @media (max-width: 767.98px) {
+    font-size: 14px;
+    line-height: 1.35;
+  }
 }
 
 @utility deck-cell {
   font-size: clamp(17px, 1.28vw, 23px);
   line-height: 1.26;
+
+  @media (max-width: 767.98px) {
+    font-size: 11px;
+    line-height: 1.25;
+  }
 }
 
 @utility deck-cell-dense {
   font-size: clamp(12px, 0.92vw, 15.5px);
   line-height: 1.15;
+
+  @media (max-width: 767.98px) {
+    font-size: 11px;
+    line-height: 1.2;
+  }
 }
 
 
@@ -227,6 +256,10 @@
   font-size: clamp(15px, 1vw, 19px);
   line-height: 1.38;
   color: var(--ink-soft);
+
+  @media (max-width: 767.98px) {
+    font-size: 12px;
+  }
 }
 
 

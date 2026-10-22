@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 import { A } from "./assets";
 import type { Row } from "./data";
 
+/** Below Tailwind's `md` breakpoint the deck is a normal scrolling page (see deck.tsx). */
+export const MOBILE_QUERY = "(max-width: 767.98px)";
+
 const ActiveCtx = createContext(false);
 export const useActive = () => useContext(ActiveCtx);
 
@@ -45,6 +48,27 @@ export function R({
       style={{ animationDelay: `${d * 90}ms`, ...style }}
     >
       {children}
+    </div>
+  );
+}
+
+/** Phones: lets a wide table keep its desktop column layout and pan sideways
+ *  instead of being squeezed. No-op from `md` up. */
+export function MobileScroll({
+  minWidth,
+  children,
+  className,
+}: {
+  /** Natural width (px) the content needs on a phone. */
+  minWidth: number;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("md:contents max-md:w-full max-md:min-w-0 max-md:overflow-x-auto max-md:pb-1", className)}>
+      <div style={{ ["--mobile-min" as string]: `${minWidth}px` }} className="md:contents max-md:min-w-[var(--mobile-min)]">
+        {children}
+      </div>
     </div>
   );
 }
@@ -98,12 +122,18 @@ export function Slide({
     if (!el) return;
     const io = new IntersectionObserver(
       ([e]) => {
-        if (e.intersectionRatio > 0.55) {
+        // On phones a slide can be taller than the screen, so its visible ratio may
+        // never reach 0.55 — count it as current once it fills half the viewport.
+        const phone = window.matchMedia(MOBILE_QUERY).matches;
+        const visible = phone
+          ? e.intersectionRect.height >= Math.min(window.innerHeight * 0.5, e.boundingClientRect.height * 0.55)
+          : e.intersectionRatio > 0.55;
+        if (visible) {
           setActive(true);
           onActive(index);
         }
       },
-      { threshold: [0, 0.55, 0.9] },
+      { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.55, 0.6, 0.7, 0.8, 0.9, 1] },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -117,7 +147,7 @@ export function Slide({
         id={id}
         ref={ref}
         className={cn(
-          "relative isolate flex h-screen w-full shrink-0 snap-start flex-col overflow-hidden",
+          "relative isolate flex h-screen w-full shrink-0 snap-start flex-col overflow-hidden max-md:h-auto max-md:min-h-dvh max-md:snap-always",
           tone === "light" && "bg-background text-foreground",
           tone === "dark" && (bg ? "surface-dark" : "surface-readable"),
           tone === "band" && "surface-band",
@@ -149,8 +179,8 @@ export function Slide({
         ) : null}
         <header
           className={cn(
-            "relative z-20 flex items-center justify-between pl-[4vw] pr-[6vw]",
-            patch ? "pt-[2.6vh]" : "pt-[2vh]",
+            "relative z-20 flex items-center justify-between pl-[4vw] pr-[6vw] max-md:px-4",
+            patch ? "pt-[2.6vh] max-md:pt-6" : "pt-[2vh] max-md:pt-4",
           )}
         >
           {/* The logo SVG is white; paint it through a mask so it reads as
@@ -171,12 +201,12 @@ export function Slide({
           </span>
         </header>
 
-        <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden pl-[4vw] pr-[6vw] pb-[2vh] pt-[1.2vh]">
+        <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden pl-[4vw] pr-[6vw] pb-[2vh] pt-[1.2vh] max-md:overflow-visible max-md:px-4 max-md:pb-20 max-md:pt-3">
           {title ? (
             <R a="rise">
               <h2
                 className={cn(
-                  "deck-title max-w-[92%] text-balance",
+                  "deck-title max-w-[92%] text-balance max-md:max-w-full",
                   dark ? "text-on-dark" : "text-brand",
                 )}
               >
@@ -184,10 +214,12 @@ export function Slide({
               </h2>
             </R>
           ) : null}
-          <div className="mt-[1.6vh] flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
+          <div className="mt-[1.6vh] flex min-h-0 flex-1 flex-col overflow-hidden max-md:mt-5 max-md:overflow-visible">
+            {children}
+          </div>
           {footnote ? (
             <R d={6} a="fade">
-              <p className={cn("deck-note pt-[1.2vh]", dark && "text-on-dark/55")}>{footnote}</p>
+              <p className={cn("deck-note pt-[1.2vh] max-md:pt-4", dark && "text-on-dark/55")}>{footnote}</p>
             </R>
           ) : null}
         </div>
@@ -213,7 +245,7 @@ export function Bullets({
   className?: string;
 }) {
   return (
-    <ul className={cn("space-y-[1.15vh]", className)}>
+    <ul className={cn("space-y-[1.15vh] max-md:space-y-3", className)}>
       {items.map((raw, i) => {
         const obj =
           raw && typeof raw === "object" && "text" in (raw as Record<string, unknown>)
@@ -221,7 +253,7 @@ export function Bullets({
             : { text: raw as ReactNode, sub: false };
         return (
           <R key={i} d={start + i} a="rise">
-            <li className={cn("flex gap-3.5", obj.sub && "pl-[2.2vw]")}>
+            <li className={cn("flex gap-3.5", obj.sub && "pl-[2.2vw] max-md:pl-4")}>
               <span
                 className={cn(
                   "mt-[0.6em] shrink-0 rotate-45",
@@ -254,6 +286,8 @@ export function DataTable({
   firstColLabel = "",
   colWidth = "minmax(52px, 1fr)",
   labelWidth = "minmax(150px, 1.6fr)",
+  mobileColWidth = "minmax(44px, 1fr)",
+  mobileLabelWidth = "minmax(112px, 1.4fr)",
   activeCol,
   onColHover,
   flags,
@@ -277,6 +311,9 @@ export function DataTable({
   firstColLabel?: string;
   colWidth?: string;
   labelWidth?: string;
+  /** Column templates used on phones, where the table sits inside a `MobileScroll`. */
+  mobileColWidth?: string;
+  mobileLabelWidth?: string;
   activeCol?: number | null;
   onColHover?: (i: number | null) => void;
   flags?: Record<string, string>;
@@ -304,9 +341,12 @@ export function DataTable({
   valueAlign?: "right" | "center";
 }) {
 
+  // Desktop and phone templates travel as CSS variables so the breakpoint lives in the class.
   const grid = {
-    gridTemplateColumns: `${labelWidth} repeat(${columns.length}, ${colWidth})`,
+    "--cols-d": `${labelWidth} repeat(${columns.length}, ${colWidth})`,
+    "--cols-m": `${mobileLabelWidth} repeat(${columns.length}, ${mobileColWidth})`,
   } as CSSProperties;
+  const gridCols = "grid-cols-[var(--cols-d)] max-md:grid-cols-[var(--cols-m)]";
 
   // Beat between rows, in R's `d` units (1 unit = 90ms) — slow enough that
   // the reveal actually reads as motion rather than everything landing at once.
@@ -335,14 +375,15 @@ export function DataTable({
         <div
           className={cn(
             "grid shrink-0 items-end gap-x-1",
+            gridCols,
             headerBar
               ? cn(
                   "bg-brand px-2 text-on-dark",
-                  dense ? "py-[0.3vh]" : fill ? "py-[0.55vh]" : "py-[0.7vh]",
+                  dense ? "py-[0.3vh]" : fill ? "py-[0.55vh]" : "py-[0.7vh] max-md:py-1.5",
                 )
               : cn(
                   "border-b-2",
-                  dense ? "pb-[0.3vh]" : fill ? "pb-[0.55vh]" : "pb-[0.7vh]",
+                  dense ? "pb-[0.3vh]" : fill ? "pb-[0.55vh]" : "pb-[0.7vh] max-md:pb-1.5",
                   dark ? "border-on-dark/45" : "border-brand",
                 ),
           )}
@@ -428,13 +469,14 @@ export function DataTable({
               key={row.label + ri}
               className={cn(
                 "group grid items-center gap-x-1 border-b transition-colors",
+                gridCols,
                 fill
                   ? "min-h-0 flex-[1_1_0]"
                   : dense
-                    ? "py-[0.06vh]"
+                    ? "py-[0.06vh] max-md:py-1"
                     : compact
-                      ? "py-[0.22vh]"
-                      : "py-[0.5vh]",
+                      ? "py-[0.22vh] max-md:py-1"
+                      : "py-[0.5vh] max-md:py-1",
                 dark ? "border-on-dark/12 hover:bg-on-dark/8" : "border-rule hover:bg-panel",
                 shadeRows?.includes(row.label) && (dark ? "bg-on-dark/5" : "bg-panel"),
                 row.kind === "total" &&
@@ -446,20 +488,22 @@ export function DataTable({
                 className={cn(
                   cellType,
                   "flex items-center gap-2.5 pr-2",
-                  indent?.includes(row.label) && "pl-[1.6vw]",
+                  indent?.includes(row.label) && "pl-[1.6vw] max-md:pl-3",
                   accentRows?.includes(row.label) && "font-bold text-brand",
                 )}
               >
                 {stagger ? (
-                  <R d={cellDelay(0)} a="fade" className="flex items-center gap-2.5">
+                  <R d={cellDelay(0)} a="fade" className="flex items-center gap-2.5 max-md:gap-1.5">
                     {flags?.[row.label] ? (
                       <img
                         src={flags[row.label]}
                         alt=""
-                        className="h-[20px] w-[20px] shrink-0 rounded-full object-cover"
+                        className="h-[20px] w-[20px] shrink-0 rounded-full object-cover max-md:h-4 max-md:w-4"
                       />
                     ) : null}
-                    <span className="truncate">{row.label}</span>
+                    <span className="truncate max-md:min-w-0 max-md:overflow-visible max-md:whitespace-normal">
+                      {row.label}
+                    </span>
                   </R>
                 ) : (
                   <>
@@ -467,10 +511,12 @@ export function DataTable({
                       <img
                         src={flags[row.label]}
                         alt=""
-                        className="h-[20px] w-[20px] shrink-0 rounded-full object-cover"
+                        className="h-[20px] w-[20px] shrink-0 rounded-full object-cover max-md:h-4 max-md:w-4"
                       />
                     ) : null}
-                    <span className="truncate">{row.label}</span>
+                    <span className="truncate max-md:min-w-0 max-md:overflow-visible max-md:whitespace-normal">
+                      {row.label}
+                    </span>
                   </>
                 )}
               </div>
@@ -494,7 +540,7 @@ export function DataTable({
                 const content = isSingleBox ? (
                   <span
                     className={cn(
-                      "inline-block border-2 px-[0.5vw] py-[0.1vh]",
+                      "inline-block border-2 px-[0.5vw] py-[0.1vh] max-md:px-1",
                       boxOn ? "border-magenta" : "border-transparent",
                     )}
                     style={boxTransitionStyle}
