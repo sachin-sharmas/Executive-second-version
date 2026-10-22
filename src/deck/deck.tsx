@@ -122,6 +122,47 @@ export function Deck() {
     });
   }, []);
 
+  // Phones: the arrows and indicator go straight to a slide — a quick fade instead of
+  // scrolling through the content in between. Swiping still scrolls natively.
+  const jumpTo = useCallback((i: number) => {
+    const wrapper = scrollerRef.current;
+    const idx = Math.max(0, Math.min(SLIDES.length - 1, i));
+    const el = document.getElementById(SLIDES[idx]?.id ?? "");
+    if (!wrapper || !el) return;
+    targetRef.current = idx;
+    wrapper.style.transition = "opacity 120ms ease-out";
+    wrapper.style.opacity = "0";
+    window.setTimeout(() => {
+      wrapper.style.scrollSnapType = "none";
+      wrapper.scrollTop = el.offsetTop;
+      wrapper.style.scrollSnapType = "";
+      wrapper.style.opacity = "1";
+    }, 120);
+  }, []);
+
+  // Next / previous from where the page actually is, so a tall slide scrolled part-way
+  // can't make the arrow skip a slide. "Previous" first returns to the top of the
+  // slide being read, then to the one before it.
+  const step = useCallback(
+    (dir: 1 | -1) => {
+      const wrapper = scrollerRef.current;
+      if (!wrapper) return;
+      const y = wrapper.scrollTop;
+      const tops = SLIDES.map((sl) => document.getElementById(sl.id)?.offsetTop ?? 0);
+      if (dir === 1) {
+        const next = tops.findIndex((t) => t > y + 2);
+        if (next >= 0) jumpTo(next);
+        return;
+      }
+      let prev = -1;
+      tops.forEach((t, i) => {
+        if (t < y - 2) prev = i;
+      });
+      if (prev >= 0) jumpTo(prev);
+    },
+    [jumpTo],
+  );
+
   // Wheel: one slide per gesture. Small deltas accumulate so a light trackpad
   // flick still counts, and anything arriving mid-move is swallowed.
   useEffect(() => {
@@ -236,7 +277,7 @@ export function Deck() {
         {SLIDES.map((s, i) => (
           <button
             key={s.id}
-            onClick={() => goTo(i)}
+            onClick={() => (mobile ? jumpTo(i) : goTo(i))}
             aria-label={s.label}
             aria-current={current === i}
             className="group flex items-center gap-3 max-md:py-1"
@@ -264,14 +305,19 @@ export function Deck() {
       {/* Phones: previous / next arrows (desktop uses the arrow keys). */}
       <div className="fixed bottom-4 right-4 z-50 flex gap-2 md:hidden">
         {[
-          { label: "Previous slide", Icon: ChevronUp, to: current - 1, off: current === 0 },
-          { label: "Next slide", Icon: ChevronDown, to: current + 1, off: current === SLIDES.length - 1 },
-        ].map(({ label, Icon, to, off }) => (
+          { label: "Previous slide", Icon: ChevronUp, dir: -1 as const, off: current === 0 },
+          {
+            label: "Next slide",
+            Icon: ChevronDown,
+            dir: 1 as const,
+            off: current === SLIDES.length - 1,
+          },
+        ].map(({ label, Icon, dir, off }) => (
           <button
             key={label}
             aria-label={label}
             disabled={off}
-            onClick={() => goTo(to)}
+            onClick={() => step(dir)}
             className="grid h-10 w-10 place-items-center rounded-full bg-brand-deep/85 text-white shadow-lg backdrop-blur transition-opacity disabled:opacity-30"
           >
             <Icon className="h-5 w-5" />
