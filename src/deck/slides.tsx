@@ -253,31 +253,39 @@ export function SlideOptions(p: P) {
     >
       <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[2vw] max-md:gap-5 lg:grid-cols-[1.45fr_1fr]">
         {/* flow */}
-        <div className="border border-on-dark/30 bg-on-dark/5 p-[1.6vw] max-md:p-3">
-          <div className="grid grid-cols-[1fr_0.5fr_1.2fr] items-center gap-y-[2.4vh] max-md:grid-cols-1 max-md:gap-y-3">
-            <R d={1} a="rise" className="row-span-2 max-md:row-span-1">
-              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.6vw] max-md:p-3">
-                <p className="deck-body font-bold text-on-dark">EMEA Organization</p>
-                <p className="deck-small mt-[0.8vh] text-on-dark/80">~166 FTEs &amp; $95 MM OPEX</p>
+        <div className="border border-on-dark/30 bg-on-dark/5 p-[1.6vw] max-md:p-2">
+          <div className="grid grid-cols-[1fr_0.5fr_1.2fr] items-center gap-y-[2.4vh] max-md:grid-cols-[1fr_0.45fr_1.25fr]">
+            <R d={1} a="rise" className="row-span-2">
+              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.6vw] max-md:p-2">
+                <p className="deck-body font-bold text-on-dark max-md:text-[13px] max-md:leading-tight">
+                  EMEA Organization
+                </p>
+                <p className="deck-small mt-[0.8vh] text-on-dark/80 max-md:text-[11px]">
+                  ~166 FTEs &amp; $95 MM OPEX
+                </p>
               </article>
             </R>
-            <div className="row-span-2 h-full self-stretch max-md:hidden">
+            <div className="row-span-2 h-full self-stretch">
               <FlowConnector />
             </div>
-            {/* phones stack the flow top-to-bottom, so the connector becomes a single down arrow */}
-            <div aria-hidden className="flex justify-center md:hidden">
-              <span className="h-0 w-0 border-x-[9px] border-t-[12px] border-x-transparent border-t-white/75" />
-            </div>
             <R d={FLOW_D.box2} a="rise">
-              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw] max-md:p-3">
-                <p className="deck-body font-bold text-on-dark">Global Clin Ops and Tech Ops</p>
-                <p className="deck-small mt-[0.6vh] text-on-dark/80">~51 FTEs &amp; ~$25 MM annual OPEX</p>
+              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw] max-md:p-2">
+                <p className="deck-body font-bold text-on-dark max-md:text-[13px] max-md:leading-tight">
+                  Global Clin Ops and Tech Ops
+                </p>
+                <p className="deck-small mt-[0.6vh] text-on-dark/80 max-md:text-[11px]">
+                  ~51 FTEs &amp; ~$25 MM annual OPEX
+                </p>
               </article>
             </R>
             <R d={FLOW_D.box3} a="rise">
-              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw] max-md:p-3">
-                <p className="deck-body font-bold text-on-dark">EMEA commercialisation engine</p>
-                <p className="deck-small mt-[0.6vh] text-on-dark/80">~ 115 FTEs &amp; ~$70 MM annual OPEX</p>
+              <article className="border border-on-dark/45 bg-on-dark/8 p-[1.4vw] max-md:p-2">
+                <p className="deck-body font-bold text-on-dark max-md:text-[13px] max-md:leading-tight">
+                  EMEA commercialisation engine
+                </p>
+                <p className="deck-small mt-[0.6vh] text-on-dark/80 max-md:text-[11px]">
+                  ~ 115 FTEs &amp; ~$70 MM annual OPEX
+                </p>
               </article>
             </R>
           </div>
@@ -526,7 +534,7 @@ function Breakeven2032Body() {
               </p>
               <svg
                 viewBox="0 0 34 52"
-                className="anim-nudge-bob h-[4.6vh] w-auto shrink-0"
+                className="anim-nudge-bob h-[4.6vh] w-auto shrink-0 max-md:mr-[calc(25%-12px)] max-md:h-9 max-md:self-end"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="3.2"
